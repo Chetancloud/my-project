@@ -13,4 +13,4 @@ WORKDIR /home/ubuntu/my-project
 EXPOSE 8080
 
 CMD ["run", "chmod +x \my-project"]
-CMD["java","-jar","parent-join-client-5.6.4.jar"]
+#CMD["java","-jar","parent-join-client-5.6.4.jar"]
