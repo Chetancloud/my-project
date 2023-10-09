@@ -4,14 +4,6 @@ WORKDIR /home/ubuntu/my-project
 # RUN cd my-project && git checkout docker && mvn install
 COPY pom.xml .
 COPY target/vprofile-v2/WEB-INF/lib/*.jar parent-join-client-5.6.4.jar
- 
-FROM amazoncorretto:latest as custom-jre
-CMD["run","jlink \ 
-                  -- verbose \
-                  --add-module java.base,java.compiler,java.desktop,java.security
-                  --strip-debug \
-                  --no-man-pages \
-                  --compress=2 "]
                   
 FROM amazoncorretto:latest
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
