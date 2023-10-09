@@ -1,13 +1,24 @@
-FROM openjdk:11 AS BUILD_IMAGE
-RUN apt update && apt install maven -y
-RUN git clone https://github.com/awsbeginnertutorial/my-project.git
-RUN cd my-project && git checkout docker && mvn install
+FROM amazoncorretto:17-alpine AS builder
+WORKDIR /home/ubuntu/my-project
+# RUN git clone https://github.com/awsbeginnertutorial/my-project.git
+# RUN cd my-project && git checkout docker && mvn install
+COPY pom.xml .
+COPY target/vprofile-v2/WEB-INF/lib/*.jar parent-join-client-5.6.4.jar
  
-FROM tomcat:9-jre11
- 
-RUN rm -rf /usr/local/tomcat/webapps/*
- 
-COPY --from=BUILD_IMAGE my-project/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
- 
+FROM amazoncorretto:latest as custom-jre
+CMD["run","jlink \ 
+                  -- verbose \
+                  --add-module java.base,java.compiler,java.desktop,java.security
+                  --strip-debug \
+                  --no-man-pages \
+                  --compress=2 "]
+                  
+FROM amazoncorretto:latest
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+WORKDIR /home/ubuntu/my-project
+
 EXPOSE 8080
-CMD ["catalina.sh", "run"]
+
+CMD ["run", "chmod +x \my-project"]
+ENTRYPOINT["java","-jar","parent-join-client-5.6.4.jar"]
